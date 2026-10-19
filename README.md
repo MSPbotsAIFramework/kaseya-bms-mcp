@@ -31,7 +31,7 @@ is missing. Unresolved `${...}` placeholders count as missing.
 
 ## Tools
 
-All tools return a JSON string. Lists take `top` (page size, max 500) and `skip` (rounded down
+All tools return a JSON string. Lists take `top` (page size, default 50, max 200) and `skip` (rounded down
 to a whole page) and return `{count, total, page, has_more, next_skip}`. **write** marks tools
 that change data.
 

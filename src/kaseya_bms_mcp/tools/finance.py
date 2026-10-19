@@ -27,7 +27,7 @@ def register(mcp: FastMCP, client_factory: ClientFactory) -> None:
     @mcp.tool(annotations=READ_ONLY)
     async def kaseya_bms_list_contracts(
         filter: Annotated[str | None, Field(description="Contract name contains this text.")] = None,
-        top: Annotated[int, Field(description=f"Page size (default 250, max {MAX_PAGE_SIZE}).", ge=1, le=MAX_PAGE_SIZE)] = 250,
+        top: Annotated[int, Field(description=f"Page size (default 50, max {MAX_PAGE_SIZE}).", ge=1, le=MAX_PAGE_SIZE)] = 50,
         skip: Skip = None,
         account_name: Annotated[str | None, Field(description="Account name.")] = None,
         status: Annotated[str | None, Field(description="Contract status, e.g. Active.")] = None,

@@ -27,7 +27,7 @@ from ._common import LOCAL, READ_ONLY, ClientFactory, Skip, compact, page, pagin
 def register(mcp: FastMCP, client_factory: ClientFactory) -> None:
     @mcp.tool(annotations=READ_ONLY)
     async def kaseya_bms_list_service_catalog(
-        top: Annotated[int, Field(description=f"Page size (default 250, max {MAX_PAGE_SIZE}).", ge=1, le=MAX_PAGE_SIZE)] = 250,
+        top: Annotated[int, Field(description=f"Page size (default 50, max {MAX_PAGE_SIZE}).", ge=1, le=MAX_PAGE_SIZE)] = 50,
         skip: Skip = None,
         name: Annotated[str | None, Field(description="Service name contains this text.")] = None,
     ) -> str:

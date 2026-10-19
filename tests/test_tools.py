@@ -92,6 +92,13 @@ def test_write_tools_say_when_to_use_them(tools, name):
     assert "explicitly ask" in tools[name].description
 
 
+@pytest.mark.parametrize("name", sorted(set(UPSTREAM_PARAMS) - LOCAL_TOOLS - WRITE_TOOLS))
+def test_paged_lists_cap_top_at_200(tools, name):
+    top = tools[name].inputSchema["properties"]["top"]
+    assert top["maximum"] == 200
+    assert top["default"] == 50
+
+
 def test_instructions_budget():
     assert len(INSTRUCTIONS) <= 1500
     assert "\n" in INSTRUCTIONS

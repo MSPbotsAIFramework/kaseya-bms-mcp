@@ -22,7 +22,7 @@ from ..api_client import BmsClient
 from ..config import MAX_PAGE_SIZE
 from ._common import READ_ONLY, ClientFactory, Skip, compact, page, paging, run_tool
 
-Top = Annotated[int, Field(description=f"Page size (default 250, max {MAX_PAGE_SIZE}).", ge=1, le=MAX_PAGE_SIZE)]
+Top = Annotated[int, Field(description=f"Page size (default 50, max {MAX_PAGE_SIZE}).", ge=1, le=MAX_PAGE_SIZE)]
 Active = Annotated[bool | None, Field(description="Only active (true) or inactive (false).")]
 
 
@@ -30,7 +30,7 @@ def register(mcp: FastMCP, client_factory: ClientFactory) -> None:
     @mcp.tool(annotations=READ_ONLY)
     async def kaseya_bms_list_accounts(
         filter: Annotated[str | None, Field(description="Account name contains this text.")] = None,
-        top: Top = 250,
+        top: Top = 50,
         skip: Skip = None,
         account_code: Annotated[str | None, Field(description="Account code.")] = None,
         account_type: Annotated[str | None, Field(description="Account type name, e.g. Customer.")] = None,
@@ -50,7 +50,7 @@ def register(mcp: FastMCP, client_factory: ClientFactory) -> None:
     @mcp.tool(annotations=READ_ONLY)
     async def kaseya_bms_list_contacts(
         filter: Annotated[str | None, Field(description="An email address, or text the account name contains.")] = None,
-        top: Top = 250,
+        top: Top = 50,
         skip: Skip = None,
         account_id: Annotated[int | None, Field(description="Only contacts of this account.", ge=1)] = None,
         first_name: Annotated[str | None, Field(description="First name.")] = None,

@@ -100,7 +100,7 @@ def register(mcp: FastMCP, client_factory: ClientFactory) -> None:
     @mcp.tool(annotations=READ_ONLY)
     async def kaseya_bms_list_tickets(
         filter: Annotated[str | None, Field(description="Text to search for in tickets (number, title, details ...).")] = None,
-        top: Annotated[int, Field(description=f"Page size (default 100, max {MAX_PAGE_SIZE}).", ge=1, le=MAX_PAGE_SIZE)] = 100,
+        top: Annotated[int, Field(description=f"Page size (default 50, max {MAX_PAGE_SIZE}).", ge=1, le=MAX_PAGE_SIZE)] = 50,
         skip: Skip = None,
         status_names: Annotated[str | None, Field(description="Comma-separated status names, e.g. New,In Progress.")] = None,
         priority_names: Annotated[str | None, Field(description="Comma-separated priority names.")] = None,

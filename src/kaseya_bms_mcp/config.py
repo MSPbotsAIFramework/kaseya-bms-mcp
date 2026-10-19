@@ -22,7 +22,7 @@ REGION_HOSTS = {
     "apac": "https://api.bmsapac.kaseya.com",
 }
 DEFAULT_REGION = "us"
-MAX_PAGE_SIZE = 500
+MAX_PAGE_SIZE = 200
 
 
 class Settings(BaseSettings):

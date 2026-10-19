@@ -31,7 +31,7 @@ def register(mcp: FastMCP, client_factory: ClientFactory) -> None:
     async def kaseya_bms_list_time_entries(
         startDate: Annotated[str | None, Field(description="ISO date: entries starting on or after (default 7 days ago).")] = None,
         endDate: Annotated[str | None, Field(description="ISO date: entries starting on or before (default today).")] = None,
-        top: Annotated[int, Field(description=f"Page size (default 100, max {MAX_PAGE_SIZE}).", ge=1, le=MAX_PAGE_SIZE)] = 100,
+        top: Annotated[int, Field(description=f"Page size (default 50, max {MAX_PAGE_SIZE}).", ge=1, le=MAX_PAGE_SIZE)] = 50,
         skip: Skip = None,
         ticket_id: Annotated[int | None, Field(description="Only this ticket's entries.", ge=1)] = None,
         user_id: Annotated[int | None, Field(description="Only this user's entries.", ge=1)] = None,
