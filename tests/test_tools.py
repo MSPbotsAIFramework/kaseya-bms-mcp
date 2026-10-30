@@ -34,6 +34,10 @@ EXPECTED_TOOLS: dict[str, set[str]] = {
     "kaseya_bms_list_contracts": set(),
     "kaseya_bms_list_service_catalog": set(),
     "kaseya_bms_search_knowledge_base": set(),
+    "kaseya_bms_list_projects": set(),
+    "kaseya_bms_get_project": {"projectId"},
+    "kaseya_bms_list_project_tasks": set(),
+    "kaseya_bms_get_task_related_items": {"taskId"},
 }
 # Every parameter the earlier version declared is still accepted.
 UPSTREAM_PARAMS: dict[str, set[str]] = {

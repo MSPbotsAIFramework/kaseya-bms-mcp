@@ -50,13 +50,17 @@ request_id_var: contextvars.ContextVar[str] = contextvars.ContextVar("bms_reques
 
 INSTRUCTIONS = (
     "Kaseya BMS is a PSA: service desk tickets for the MSP's client accounts, "
-    "with notes, time logs, contacts and contracts.\n"
+    "with notes, time logs, contacts, contracts and projects.\n"
     "Usage:\n"
     "- Find tickets: kaseya_bms_list_tickets (filter text, status / priority "
     "names, account, open-date range) -> kaseya_bms_get_ticket.\n"
     "- Who and what: kaseya_bms_list_accounts / _list_contacts / _list_contracts "
     "give the AccountId and ContactId other tools take.\n"
     "- Time: kaseya_bms_list_time_entries(startDate, endDate).\n"
+    "- Projects: kaseya_bms_list_projects (account, status names) -> "
+    "kaseya_bms_get_project; kaseya_bms_list_project_tasks (project, account, "
+    "name, unassigned, my_projects) -> kaseya_bms_get_task_related_items. "
+    "Read-only: BMS has no API to create or edit a project or task.\n"
     "- Lists page with top (page size) and skip (rounded to whole pages).\n"
     "Creating tickets and adding notes write to the live PSA: only when the "
     "user explicitly asks. A ticket needs an AccountId; status, priority, type, "
@@ -134,9 +138,9 @@ def create_mcp_server(settings: Settings | None = None) -> FastMCP:
 
     client_factory: Callable[[], BmsClient | None] = get_client_from_context
 
-    from .tools import crm, finance, service, tickets, time_entries
+    from .tools import crm, finance, projects, service, tickets, time_entries
 
-    for module in (tickets, time_entries, crm, finance, service):
+    for module in (tickets, time_entries, crm, finance, service, projects):
         module.register(mcp, client_factory)
 
     return mcp
