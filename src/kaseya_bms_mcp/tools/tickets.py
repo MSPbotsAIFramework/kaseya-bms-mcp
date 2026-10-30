@@ -21,7 +21,7 @@ from pydantic import Field
 
 from ..api_client import BmsClient
 from ..config import MAX_PAGE_SIZE
-from ._common import READ_ONLY, WRITES, ClientFactory, Skip, compact, page, paging, result, run_tool
+from ._common import READ_ONLY, WRITES, ClientFactory, Skip, by_name, compact, page, paging, result, run_tool
 
 TicketId = Annotated[str, Field(description="BMS ticket id (numeric Id, not the ticket number).", min_length=1)]
 OptionalId = Annotated[int | None, Field(description="Override; omitted = the usual value (see the tool).", ge=1)]
@@ -43,18 +43,10 @@ def _rows(payload: Any) -> list[dict]:
     return [r for r in rows if isinstance(r, dict)] if isinstance(rows, list) else []
 
 
-def _by_name(rows: list[dict], name: str, what: str) -> int:
-    for row in rows:
-        if str(row.get("Name") or "").strip().lower() == name.strip().lower():
-            return int(row["Id"])
-    options = ", ".join(str(r.get("Name")) for r in rows[:30])
-    raise ValueError(f"Unknown {what} {name!r}. Known values: {options}.")
-
-
 async def _priority_id(client: BmsClient, name: str | None) -> int:
     rows = _rows(await client.get("v2/system/priorities/lookup"))
     if name:
-        return _by_name(rows, name, "priority")
+        return by_name(rows, name, "priority")
     default = next((r for r in rows if r.get("IsDefault")), rows[0] if rows else None)
     if not default:
         raise ValueError("Kaseya BMS returned no priorities; pass a priority.")
@@ -64,7 +56,7 @@ async def _priority_id(client: BmsClient, name: str | None) -> int:
 async def _status_id(client: BmsClient, name: str | None) -> int:
     rows = [r for r in _rows(await client.get("v2/system/statuses/lookup")) if r.get("IsActive", True)]
     if name:
-        return _by_name(rows, name, "status")
+        return by_name(rows, name, "status")
     rows.sort(key=lambda r: (str(r.get("Name") or "").lower() != "new", r.get("StatusOrder") or 0))
     if not rows:
         raise ValueError("Kaseya BMS returned no statuses; pass a status.")

@@ -59,6 +59,19 @@ def result(payload: Any) -> Any:
     return payload
 
 
+def by_name(rows: list[dict], name: str, what: str) -> int:
+    """Match ``name`` against a `.../lookup` list's `Name` field (case-insensitive).
+
+    Raises ``ValueError`` naming the known values on a miss, so a tool that calls this
+    turns an unmatched name into the standard `invalid_argument` envelope via `run_tool`.
+    """
+    for row in rows:
+        if str(row.get("Name") or "").strip().lower() == name.strip().lower():
+            return int(row["Id"])
+    options = ", ".join(str(r.get("Name")) for r in rows[:30])
+    raise ValueError(f"Unknown {what} {name!r}. Known values: {options}.")
+
+
 def page(payload: Any, key: str, params: dict[str, int]) -> dict:
     rows = result(payload)
     rows = rows if isinstance(rows, list) else ([] if rows is None else [rows])

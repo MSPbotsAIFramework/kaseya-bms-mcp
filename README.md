@@ -2,8 +2,8 @@
 
 An [MCP](https://modelcontextprotocol.io) server for the [Kaseya BMS](https://www.kaseya.com/products/bms/)
 REST API (v2), the PSA where MSPs run their service desk. It lets an AI agent read service desk
-tickets, time entries, client accounts, contacts, contracts and the service catalog and, on
-explicit request, create tickets and add ticket notes.
+tickets, time entries, client accounts, contacts, contracts, projects/project tasks and the
+service catalog and, on explicit request, create tickets and add ticket notes.
 
 - Transport: MCP Streamable HTTP at `POST /mcp`, health probe at `GET /health`
 - Stateless and multi-tenant: credentials arrive on every request as HTTP headers and are
@@ -113,6 +113,7 @@ that change data.
 | Time | `kaseya_bms_list_time_entries` (startDate, endDate, ticket_id, user_id, account_id, billable) |
 | CRM | `kaseya_bms_list_accounts` (filter = account name, account_code, account_type, is_active), `kaseya_bms_list_contacts` (filter = email or account name, account_id, first_name, last_name, is_active) |
 | Finance | `kaseya_bms_list_contracts` (filter = contract name, account_name, status, contract_type) |
+| Projects | `kaseya_bms_list_projects` (account_id, status_names, start_date_from, start_date_to), `kaseya_bms_get_project` (**projectId**), `kaseya_bms_list_project_tasks` (project_id, account_id, task_name, unassigned, my_projects), `kaseya_bms_get_task_related_items` (**taskId**) — read-only: BMS has no API to create or edit a project or task |
 | Service | `kaseya_bms_list_service_catalog` (name), `kaseya_bms_search_knowledge_base` (no API; see below) |
 
 Errors come back as a JSON envelope instead of an exception:
@@ -172,8 +173,14 @@ uv run pytest
 
 ## Delivery notes
 
-- **Tool count (10).** Kept as is because the tool names are an existing contract; every earlier
-  parameter is still accepted.
+- **Tool count (14, PRD-21214).** The original 10 tool names are kept as an existing contract;
+  every earlier parameter is still accepted. 4 read-only tools were added for BMS Projects
+  (`/v2/project/...`): the BMS v2 API has no endpoint to create or edit a project or task — only
+  the `statuses` admin-config paths are writable — so there is no corresponding write tool.
+  `kaseya_bms_list_project_tasks` calls `POST /v2/project/tasks`; despite the verb it is a paged
+  list (the body is a filter object), and that response has no `TotalRecords`, so its `has_more`
+  always reads `false` even when more rows exist — keep paging on `skip` until an empty page comes
+  back.
 - **Rebuilt on the documented API.** The official specification is published at
   `https://api.bms.kaseya.com/swagger/v2/swagger.json` (BMS API 2.0). Older versions built the
   host as `https://{tenant}.bms.kaseya.com/api`, which does not exist in DNS, and called routes
