@@ -4,63 +4,81 @@
     "ac": "AC1",
     "text": "Given valid BMS credentials and no filters, when the caller invokes kaseya_bms_list_projects, then it gets up to 50 projects (id, name, project number, status name, priority name, start/due date, created date) with count/total/page/has_more/next_skip matching the repo's existing paging contract.",
     "type": "auto",
-    "tests": ["tests/test_projects.py::test_list_projects_returns_expected_fields_and_paging"]
+    "tests": ["tests/test_projects.py::test_list_projects_returns_expected_fields_and_paging"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_projects.py::test_list_projects_returns_expected_fields_and_paging -v @ 3e05dfa -> 1 passed"
   },
   {
     "id": "TC-KBMS-002",
     "ac": "AC2",
     "text": "Given kaseya_bms_list_projects is called with account_id and status_names='Active', when the status name resolves, then the outgoing request carries Filter.AccountId and the resolved Filter.StatusIds.",
     "type": "auto",
-    "tests": ["tests/test_projects.py::test_list_projects_resolves_account_and_status_filters"]
+    "tests": ["tests/test_projects.py::test_list_projects_resolves_account_and_status_filters"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_projects.py::test_list_projects_resolves_account_and_status_filters -v @ 3e05dfa -> 1 passed (asserts Filter.AccountId=77, Filter.StatusIds=2,9 on the mocked outgoing request)"
   },
   {
     "id": "TC-KBMS-003",
     "ac": "AC2",
     "text": "Given kaseya_bms_list_projects is called with status_names='NoSuchStatus', when the name does not match any known BMS project status, then the tool returns an invalid_argument envelope naming the known status values, not an exception.",
     "type": "auto",
-    "tests": ["tests/test_projects.py::test_list_projects_unknown_status_name_is_invalid_argument"]
+    "tests": ["tests/test_projects.py::test_list_projects_unknown_status_name_is_invalid_argument"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_projects.py::test_list_projects_unknown_status_name_is_invalid_argument -v @ 3e05dfa -> 1 passed (error.code=invalid_argument, message contains 'Known values: Active'; asserts v2/project/projects/summary was never called)"
   },
   {
     "id": "TC-KBMS-004",
     "ac": "AC3",
     "text": "Given a valid project id, when the caller invokes kaseya_bms_get_project, then it gets the full project record including manager, contract, planned/used hours, planned/actual budget.",
     "type": "auto",
-    "tests": ["tests/test_projects.py::test_get_project_returns_full_record"]
+    "tests": ["tests/test_projects.py::test_get_project_returns_full_record"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_projects.py::test_get_project_returns_full_record -v @ 3e05dfa -> 1 passed"
   },
   {
     "id": "TC-KBMS-005",
     "ac": "AC4",
     "text": "Given an unknown project id, when the caller invokes kaseya_bms_get_project, then it gets a not_found error envelope, never an uncaught exception.",
     "type": "auto",
-    "tests": ["tests/test_projects.py::test_get_project_unknown_id_is_not_found"]
+    "tests": ["tests/test_projects.py::test_get_project_unknown_id_is_not_found"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_projects.py::test_get_project_unknown_id_is_not_found -v @ 3e05dfa -> 1 passed (mocked 404 -> error.code=not_found)"
   },
   {
     "id": "TC-KBMS-006",
     "ac": "AC5",
     "text": "Given kaseya_bms_list_project_tasks is called filtered by project_id and task_name, when matching tasks exist, then it returns them with project name/color, planned hours, start/end date, account id, paged with top/skip.",
     "type": "auto",
-    "tests": ["tests/test_projects.py::test_list_project_tasks_returns_matching_tasks"]
+    "tests": ["tests/test_projects.py::test_list_project_tasks_returns_matching_tasks"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_projects.py::test_list_project_tasks_returns_matching_tasks -v @ 3e05dfa -> 1 passed. Also covered: test_list_project_tasks_unassigned_and_my_projects_are_int_not_bool (BMS TasksListFilterDto types Unassigned/MyProjects as int32, not boolean -> tool sends 1/0) and test_list_project_tasks_has_no_total_records_and_never_signals_has_more (this BMS response has no TotalRecords, so 'total' is absent and has_more stays false even with a full page) both pass."
   },
   {
     "id": "TC-KBMS-007",
     "ac": "AC6",
     "text": "Given a valid task id, when the caller invokes kaseya_bms_get_task_related_items, then it gets that task's title, description, dependencies, and related service-desk tickets.",
     "type": "auto",
-    "tests": ["tests/test_projects.py::test_get_task_related_items_returns_details"]
+    "tests": ["tests/test_projects.py::test_get_task_related_items_returns_details"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_projects.py::test_get_task_related_items_returns_details -v @ 3e05dfa -> 1 passed"
   },
   {
     "id": "TC-KBMS-008",
     "ac": "AC6",
     "text": "Given an unknown task id, when the caller invokes kaseya_bms_get_task_related_items, then it gets a not_found error envelope.",
     "type": "auto",
-    "tests": ["tests/test_projects.py::test_get_task_related_items_unknown_id_is_not_found"]
+    "tests": ["tests/test_projects.py::test_get_task_related_items_unknown_id_is_not_found"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_projects.py::test_get_task_related_items_unknown_id_is_not_found -v @ 3e05dfa -> 1 passed (mocked 404 -> error.code=not_found)"
   },
   {
     "id": "TC-KBMS-009",
     "ac": "AC7",
     "text": "Given no vendor credentials are attached to the request, when any of the 4 new tools is invoked, then it returns the existing not_configured envelope instead of raising.",
     "type": "auto",
-    "tests": ["tests/test_projects.py::test_new_tools_return_not_configured_without_credentials"]
+    "tests": ["tests/test_projects.py::test_new_tools_return_not_configured_without_credentials"],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_projects.py::test_new_tools_return_not_configured_without_credentials -v @ 3e05dfa -> 1 passed (all 4 new tools return error.code=not_configured with no credentials in context). Cross-checked live: local server smoke test on 3e05dfa, curl to /mcp tools/list with placeholder X-Kaseya-BMS-* headers returned all 14 tool names (10 existing + 4 new); the same request with no headers returned HTTP 401; GET /health returned HTTP 200."
   },
   {
     "id": "TC-KBMS-010",
@@ -70,14 +88,18 @@
     "tests": [
       "tests/test_tools.py::test_tool_names_are_stable",
       "tests/test_projects.py::test_instructions_mention_projects"
-    ]
+    ],
+    "result": "pass",
+    "evidence": "uv run pytest tests/test_tools.py::test_tool_names_are_stable tests/test_projects.py::test_instructions_mention_projects -v @ 3e05dfa -> 2 passed. Live cross-check: curl tools/list against the local server (see TC-KBMS-009 evidence) lists all 14 tool names including the 4 new ones."
   },
   {
     "id": "TC-KBMS-011",
     "ac": "AC9",
     "text": "Given the full change, when uv run pytest is executed, then the entire suite passes, including the unchanged test_contract_types.py cases that pin the original 10 tools' backward compatibility.",
     "type": "auto",
-    "tests": ["tests/test_contract_types.py"]
+    "tests": ["tests/test_contract_types.py"],
+    "result": "pass",
+    "evidence": "uv run pytest -q @ 3e05dfa -> 156 passed, 1 warning (pre-existing starlette/httpx deprecation warning in tests/test_middleware.py, unrelated to this change) in 2.31s. uv run pytest tests/test_contract_types.py -v -> 24 passed, confirming the original 10 tools' parameter types are unchanged. uv sync (clean, no lockfile changes) ran before the suite."
   },
   {
     "id": "TC-KBMS-012",
@@ -92,6 +114,6 @@
     ],
     "expect": "Every field name/casing in the live response matches the design document; any mismatch is filed as a follow-up before the connector is marked verified against this vendor.",
     "result": "blocked",
-    "evidence": "needs a real vendor account; none available in this environment (per mcp-track.md section 2.5/3, a missing vendor test account does not block design or implementation)"
+    "evidence": "needs a real vendor account; none available in this environment (per mcp-track.md section 2.5/3, a missing vendor test account does not block design or implementation). Unchanged from design time; no vendor account became available during the dev leg either."
   }
 ]
