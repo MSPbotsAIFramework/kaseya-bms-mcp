@@ -1,0 +1,97 @@
+[
+  {
+    "id": "TC-KBMS-001",
+    "ac": "AC1",
+    "text": "Given valid BMS credentials and no filters, when the caller invokes kaseya_bms_list_projects, then it gets up to 50 projects (id, name, project number, status name, priority name, start/due date, created date) with count/total/page/has_more/next_skip matching the repo's existing paging contract.",
+    "type": "auto",
+    "tests": ["tests/test_projects.py::test_list_projects_returns_expected_fields_and_paging"]
+  },
+  {
+    "id": "TC-KBMS-002",
+    "ac": "AC2",
+    "text": "Given kaseya_bms_list_projects is called with account_id and status_names='Active', when the status name resolves, then the outgoing request carries Filter.AccountId and the resolved Filter.StatusIds.",
+    "type": "auto",
+    "tests": ["tests/test_projects.py::test_list_projects_resolves_account_and_status_filters"]
+  },
+  {
+    "id": "TC-KBMS-003",
+    "ac": "AC2",
+    "text": "Given kaseya_bms_list_projects is called with status_names='NoSuchStatus', when the name does not match any known BMS project status, then the tool returns an invalid_argument envelope naming the known status values, not an exception.",
+    "type": "auto",
+    "tests": ["tests/test_projects.py::test_list_projects_unknown_status_name_is_invalid_argument"]
+  },
+  {
+    "id": "TC-KBMS-004",
+    "ac": "AC3",
+    "text": "Given a valid project id, when the caller invokes kaseya_bms_get_project, then it gets the full project record including manager, contract, planned/used hours, planned/actual budget.",
+    "type": "auto",
+    "tests": ["tests/test_projects.py::test_get_project_returns_full_record"]
+  },
+  {
+    "id": "TC-KBMS-005",
+    "ac": "AC4",
+    "text": "Given an unknown project id, when the caller invokes kaseya_bms_get_project, then it gets a not_found error envelope, never an uncaught exception.",
+    "type": "auto",
+    "tests": ["tests/test_projects.py::test_get_project_unknown_id_is_not_found"]
+  },
+  {
+    "id": "TC-KBMS-006",
+    "ac": "AC5",
+    "text": "Given kaseya_bms_list_project_tasks is called filtered by project_id and task_name, when matching tasks exist, then it returns them with project name/color, planned hours, start/end date, account id, paged with top/skip.",
+    "type": "auto",
+    "tests": ["tests/test_projects.py::test_list_project_tasks_returns_matching_tasks"]
+  },
+  {
+    "id": "TC-KBMS-007",
+    "ac": "AC6",
+    "text": "Given a valid task id, when the caller invokes kaseya_bms_get_task_related_items, then it gets that task's title, description, dependencies, and related service-desk tickets.",
+    "type": "auto",
+    "tests": ["tests/test_projects.py::test_get_task_related_items_returns_details"]
+  },
+  {
+    "id": "TC-KBMS-008",
+    "ac": "AC6",
+    "text": "Given an unknown task id, when the caller invokes kaseya_bms_get_task_related_items, then it gets a not_found error envelope.",
+    "type": "auto",
+    "tests": ["tests/test_projects.py::test_get_task_related_items_unknown_id_is_not_found"]
+  },
+  {
+    "id": "TC-KBMS-009",
+    "ac": "AC7",
+    "text": "Given no vendor credentials are attached to the request, when any of the 4 new tools is invoked, then it returns the existing not_configured envelope instead of raising.",
+    "type": "auto",
+    "tests": ["tests/test_projects.py::test_new_tools_return_not_configured_without_credentials"]
+  },
+  {
+    "id": "TC-KBMS-010",
+    "ac": "AC8",
+    "text": "Given the deployed server, when a client calls tools/list, then all 4 new tool names are present and the server INSTRUCTIONS text mentions project and project-task lookup.",
+    "type": "auto",
+    "tests": [
+      "tests/test_tools.py::test_tool_names_are_stable",
+      "tests/test_projects.py::test_instructions_mention_projects"
+    ]
+  },
+  {
+    "id": "TC-KBMS-011",
+    "ac": "AC9",
+    "text": "Given the full change, when uv run pytest is executed, then the entire suite passes, including the unchanged test_contract_types.py cases that pin the original 10 tools' backward compatibility.",
+    "type": "auto",
+    "tests": ["tests/test_contract_types.py"]
+  },
+  {
+    "id": "TC-KBMS-012",
+    "ac": "AC1,AC3,AC5,AC6",
+    "text": "Given a real Kaseya BMS tenant, when each of the 4 new tools is called against it, then the live response field names and casing match what is documented in the design's Data & API contract section.",
+    "type": "manual",
+    "steps": [
+      "Obtain a real Kaseya BMS tenant subdomain/region and a valid API or K1 token",
+      "Run the server locally (uv run python -m kaseya_bms_mcp)",
+      "Call kaseya_bms_list_projects, kaseya_bms_get_project, kaseya_bms_list_project_tasks, kaseya_bms_get_task_related_items with the real credentials via the headers documented in README.md",
+      "Compare each response's field names/casing against the Data & API contract section of docs/tickets/PRD-21214.md"
+    ],
+    "expect": "Every field name/casing in the live response matches the design document; any mismatch is filed as a follow-up before the connector is marked verified against this vendor.",
+    "result": "blocked",
+    "evidence": "needs a real vendor account; none available in this environment (per mcp-track.md section 2.5/3, a missing vendor test account does not block design or implementation)"
+  }
+]
